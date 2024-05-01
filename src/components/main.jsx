@@ -7,7 +7,7 @@ const Main = () => {
     <header className='w-full flex justify-center items-center flex-col'>
       <nav className='flex justify-between items-center w-full mb-10 pt-3'>
         <img src={logo} alt='sumz_logo' className='w-20 object-contain' />
-        <span className='text-4xl blue_gradient'>Commune Summizer</span>
+        <span className='text-4xl blue_gradient'>Commune Summarizer</span>
 
       </nav>
 
