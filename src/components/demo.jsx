@@ -10,6 +10,7 @@ const Demo = () => {
   });
   const [allArticles, setAllArticles] = useState([]);
   const [copied, setCopied] = useState("");
+  const [historyshowflag, setHistoryshowflag] = useState(false);
 
   // RTK lazy query
   const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery();
@@ -59,6 +60,20 @@ const Demo = () => {
     }
   };
 
+  const handleDownloadSummary = () => {
+    const element = document.createElement("a");
+    const file = new Blob([article.summary], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = "summary.txt";
+    document.body.appendChild(element); // Required for this to work in Firefox
+    element.click();
+  };
+
+  const handleshow = () =>{
+    setHistoryshowflag(!historyshowflag);
+    console.log(historyshowflag);
+  }
+
   return (
     <section className='mt-16 w-full max-w-xl'>
       {/* Search */}
@@ -82,35 +97,45 @@ const Demo = () => {
             required
             className='url_input peer ' // When you need to style an element based on the state of a sibling element, mark the sibling with the peer class, and use peer-* modifiers to style the target element
           />
-          <button
+          {/* <button
             type='submit'
             className='submit_btn peer-focus:border-gray-700 peer-focus:text-gray-700 '
           >
             <p>↵</p>
+          </button> */}
+          <button type="submit" class="submit_btn text-white bg-blue-700/80 hover:bg-blue-800 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+            </svg>
+            <span class="sr-only">Icon description</span>
           </button>
         </form>
 
+        <button onClick={() => handleshow()}>show browse history</button>
+
         {/* Browse History */}
-        <div className='flex flex-col gap-1 max-h-60 overflow-y-auto'>
-          {allArticles.reverse().map((item, index) => (
-            <div
-              key={`link-${index}`}
-              onClick={() => setArticle(item)}
-              className='link_card'
-            >
-              <div className='copy_btn' onClick={() => handleCopy(item.url)}>
-                <img
-                  src={copied === item.url ? tick : copy}
-                  alt={copied === item.url ? "tick_icon" : "copy_icon"}
-                  className='w-[40%] h-[40%] object-contain'
-                />
+        {historyshowflag ?
+          <div className='flex flex-col gap-1 max-h-60 overflow-y-auto'>
+            {allArticles.reverse().map((item, index) => (
+              <div
+                key={`link-${index}`}
+                onClick={() => {setArticle(item); setHistoryshowflag(false);}}
+                className='link_card'
+              >
+                <div className='copy_btn' onClick={() => handleCopy(item.url)}>
+                  <img
+                    src={copied === item.url ? tick : copy}
+                    alt={copied === item.url ? "tick_icon" : "copy_icon"}
+                    className='w-[40%] h-[40%] object-contain'
+                  />
+                </div>
+                <p className='flex-1 font-satoshi text-blue-700 font-medium text-sm truncate'>
+                  {item.url}
+                </p>
               </div>
-              <p className='flex-1 font-satoshi text-blue-700 font-medium text-sm truncate'>
-                {item.url}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        : <></> }
       </div>
 
       {/* Display Result */}
@@ -135,6 +160,7 @@ const Demo = () => {
                 <p className='font-inter font-medium text-sm text-gray-200'>
                   {article.summary}
                 </p>
+                <button onClick={handleDownloadSummary}>Download Summary</button>
               </div>
             </div>
           )
